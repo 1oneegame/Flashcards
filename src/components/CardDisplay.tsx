@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import Loading from "./Loading";
+import { decode } from 'he';
 
 import { useScore } from "@/context/ScoreContext";
 
@@ -35,14 +36,9 @@ export default function CardDisplay() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [showAnswer, setShowAnswer] = useState<boolean>(false);
 
-    const decodeHtml = (html: string) => {
-        const txt = document.createElement('textarea');
-        txt.innerHTML = html;
-        return txt.value;
-    };
+    const decodeHtml = (html: string) => decode(html);
 
-
-    const fetchQuestion = async () => {
+    const fetchQuestion = useCallback(async () => {
         try {
             setIsLoading(true);
             
@@ -67,11 +63,27 @@ export default function CardDisplay() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
+
     useEffect(() => {
         fetchQuestion();
         setShowAnswer(false);
-    }, [questionAmount])
+    }, [questionAmount, fetchQuestion]);
+
+    useEffect(() => {
+        if (
+            currentQuestion &&
+            currentQuestion.results.length &&
+            currentQuestion.results.length === questionAmount &&
+            !wrongQuestions.every(wrong => wrong.id !== 0)
+        ) {
+            const unansweredIndex = wrongQuestions.findIndex(wrong => wrong.id === 0);
+            if (unansweredIndex !== -1) {
+                setCurrentQuestion(currentQuestion);
+            }
+        }
+    }, [currentQuestion, questionAmount, wrongQuestions, setCurrentQuestion]);
+
 
     if(isLoading){
         return(
@@ -114,7 +126,7 @@ export default function CardDisplay() {
                 {
                 <div className="absolute top-0 translate-y-6 w-full">
                         <div className="flex flex-row justify-between w-full px-12 ">
-                            <span onClick={() => { setCorrectCount(correctCount+1), setQuestionAmount(questionAmount+1) } } className={cn('p-2 text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                            <span onClick={() => { setCorrectCount(correctCount+1); setQuestionAmount(questionAmount+1); } } className={cn('p-2 text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
                                 showAnswer ? '' : 'hidden'
                             )}>
                                 I know
@@ -130,11 +142,10 @@ export default function CardDisplay() {
                                             correct_answer: currentQuestion?.results[0].correct_answer ?? "",
                                         },
                                     ]);
-                                } 
-                            } className={cn('p-2 text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                                }} className={cn('p-2 text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
                                 showAnswer ? '' : 'hidden'
                             )}>
-                                I don't know    
+                                I don&apos;t know    
                             </span>
                         </div>
                 </div>

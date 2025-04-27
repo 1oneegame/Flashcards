@@ -1,11 +1,12 @@
 'use client'
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { useCard } from "@/context/CardContext";
 import Loading from "./Loading";
+import { decode } from 'he';
 
 export default function QuestionnaireDisplay() {
     const {
@@ -28,11 +29,7 @@ export default function QuestionnaireDisplay() {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const decodeHtml = (html: string) => {
-        const txt = document.createElement('textarea');
-        txt.innerHTML = html;
-        return txt.value;
-    };
+    const decodeHtml = (html: string) => decode(html);
 
     const shuffleArray = (array: string[]) => {
         const shuffled = [...array];
@@ -43,35 +40,26 @@ export default function QuestionnaireDisplay() {
         return shuffled;
     }; 
 
-    const fetchQuestion = async () => {
+    const fetchQuestion = useCallback(async () => {
         try {
             setIsLoading(true);
-            
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            console.log(chosenCategory);
             const response = await fetch('/api/get-cards',{
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(chosenCategory),
             });
             const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
+            if (data.error) throw new Error(data.error);
             setQuestions(data);
             setAnsweredQuestions(new Array(data.results.length).fill(false));
             setSelectedAnswers(new Array(data.results.length).fill(''));
         } catch (err) {
-            console.error('Error fetching questions:', err);
+            console.error('Error fetching question:', err);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [chosenCategory, setQuestions, setAnsweredQuestions, setSelectedAnswers]);
 
     useEffect(() => {
         if (questions?.results?.[currentQuestion]) {
@@ -81,7 +69,7 @@ export default function QuestionnaireDisplay() {
             ].map(answer => decodeHtml(answer));
             setShuffledAnswers(shuffleArray(allAnswers));
         }
-    }, [questions, currentQuestion]);
+    }, [questions, currentQuestion, setShuffledAnswers]);
     
     useEffect(() => {
         setCurrentQuestion(0)
@@ -91,14 +79,13 @@ export default function QuestionnaireDisplay() {
         setSelectedAnswers([])
         setShowCorrectAnswers(false);
         fetchQuestion();
-    }, []); 
+    }, [fetchQuestion, setAnsweredQuestions, setCurrentQuestion, setScore, setSelectedAnswers, setShowCorrectAnswers, setShuffledAnswers]);
 
     if (isLoading) {
         return (
             <Loading/>
         );
     }
-
 
     if (!questions || !questions.results) {
         return null;
@@ -154,12 +141,6 @@ export default function QuestionnaireDisplay() {
                 </div>
             </div>
         );
-    }
-
-    if (currentQuestion >= questions.results.length && !allQuestionsAnswered) {
-        const unansweredIndex = answeredQuestions.findIndex(answered => !answered);
-        setCurrentQuestion(unansweredIndex);
-        return null;
     }
 
     return (

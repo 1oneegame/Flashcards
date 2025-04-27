@@ -1,7 +1,7 @@
 'use client'
 import { useCard } from "@/context/CardContext";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Loading from "./Loading";
 
 interface CategoryItem {
@@ -13,6 +13,7 @@ interface Category {
     trivia_categories: CategoryItem[]; 
 }
 
+
 export default function CategoryDisplay() {
     const [categories, setCategories] = useState<Category>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -23,18 +24,19 @@ export default function CategoryDisplay() {
         setChosenCategory,
     } = useCard();
 
-    const fetchCategories = async () => {
+    const fetchCategories = useCallback(async () => {
         const response = await fetch('api/get-categories');
         const data = await response.json();
         
         setCategories(data);
         setChosenCategory(data.trivia_categories[0]);
         setIsLoading(false);
-    } 
+    }, [setCategories, setChosenCategory]);
+
     useEffect(() => {
         setIsLoading(true);
         fetchCategories();
-    }, []); 
+    }, [fetchCategories]); 
     if (isLoading) {
         return (
             <Loading/>
