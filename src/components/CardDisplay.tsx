@@ -91,7 +91,7 @@ export default function CardDisplay() {
                         <div className="absolute backface-hidden flex-col items-center bg-white w-full h-fit min-h-[375px]">
                             <div className='relative mt-6'>
                                 <div className='flex flex-row justify-between items-center mb-2 gap-4 absolute top-0 left-1/2 -translate-x-1/2'>
-                                    <Badge className="font-medium text-sm">{decodeHtml(currentQuestion?.results[0].category)}</Badge>
+                                    <Badge className="font-medium text-sm">{decodeHtml(currentQuestion?.results[0].category || '')}</Badge>
                                     <Badge className={cn("font-medium text-sm", {
                                         "bg-green-500": currentQuestion?.results[0].difficulty === "easy",
                                         "bg-yellow-500": currentQuestion?.results[0].difficulty === "medium",
@@ -101,14 +101,14 @@ export default function CardDisplay() {
                                     </Badge>
                                 </div>
                             </div>
-                            <h1 className="text-4xl text-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ">{decodeHtml(currentQuestion?.results[0].question)}</h1>
+                            <h1 className="text-4xl text-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ">{decodeHtml(currentQuestion?.results[0].question || '')}</h1>
                             <span className="text-md text-gray-500 absolute left-1/2 bottom-0 -translate-x-1/2 -translate-y-6 ">Tap to check the answer</span>
                         </div>
 
                         <div className={cn("absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 backface-hidden flex flex-col items-center bg-white transition-all duration-300",
                             showAnswer ? 'rotate-y-180' : 'hidden rotate-y-0'
                         )}>
-                            <span className="text-4xl text-center">{decodeHtml(currentQuestion?.results[0].correct_answer)}</span>
+                            <span className="text-4xl text-center">{decodeHtml(currentQuestion?.results[0].correct_answer || '')}</span>
                             <span className="text-md text-gray-500 mt-4 text-center">Tap to return back</span>
                         </div>
 
@@ -128,6 +128,7 @@ export default function CardDisplay() {
                                     setWrongQuestions([
                                         ...wrongQuestions,
                                         {
+                                            id: questionAmount + 1,
                                             question: currentQuestion?.results[0].question ?? "",
                                             correct_answer: currentQuestion?.results[0].correct_answer ?? "",
                                         },

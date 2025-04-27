@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface questionItem {
+  id: number;
   question: string;
   correct_answer: string;
 }
