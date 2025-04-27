@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, LampCeiling, Star, Volume2 } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
@@ -37,28 +37,19 @@ export default function CardDisplay() {
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
         return shuffled;
-    }; // перемешиваю оветы
+    }; 
 
     const fetchQuestion = async () => {
-        try {
-            const Url = 'http://localhost:3000';
-            const request = await fetch(`${Url}/api/get-cards`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            const data = await request.json();
-            setQuestions(data);
-            setAnsweredQuestions(new Array(data.results.length).fill(false));
-            setSelectedAnswers(new Array(data.results.length).fill(''));
-        } catch (error) {
-            console.error('Error fetching questions:', error);
-        }
-    }; // получаю объект с вопросами 
+        const response = await fetch('/api/get-cards');
+        const data = await response.json();
+        
+        setQuestions(data);
+        setAnsweredQuestions(new Array(data.results.length).fill(false));
+        setSelectedAnswers(new Array(data.results.length).fill(''));
+    };
 
     useEffect(() => {
-        if (questions?.results[currentQuestion]) {
+        if (questions?.results?.[currentQuestion]) {
             const allAnswers = [
                 questions.results[currentQuestion].correct_answer,
                 ...questions.results[currentQuestion].incorrect_answers

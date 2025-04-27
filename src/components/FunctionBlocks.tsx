@@ -1,0 +1,42 @@
+'use client'
+import { CopyPlus, FileText, GraduationCap, IdCard } from "lucide-react"
+import { useRouter } from "next/navigation"
+
+export default function FunctionBlocks(){
+        const router = useRouter();
+
+    const cardFunction = [
+        {
+        title: "Flashcards",
+        href: "/",
+        icon: <IdCard className="w-8 h-8 text-blue-600"/>,
+        },
+        {
+        title: "Learn",
+        href: "/",
+        icon: <GraduationCap className="w-8 h-8 text-blue-600"/>,
+        },
+        {
+        title: "Test",
+        href: "test/",
+        icon: <FileText className="w-8 h-8 text-blue-600"/>,
+        },
+        {
+        title: "Match",
+        href: "/",
+        icon: <CopyPlus className="w-8 h-8 text-blue-600"/>,
+        },
+    ]
+    return(
+        <div className="grid grid-cols-4 gap-8 mx-42 mt-8">
+            {
+              cardFunction.map((item, index) => (
+                <div onClick={() => router.push(item.href)} key={index} className="cursor-pointer border-1 shadow-md rounded-lg w-full min-h-[125px] flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 bg-indigo-100/20">
+                  {item.icon}
+                  <h2 className="text-xl">{item.title}</h2>
+                </div>
+              ))
+            }
+        </div>
+    )
+}

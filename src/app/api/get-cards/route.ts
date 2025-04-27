@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server';
 
-const api_url = "https://opentdb.com/api.php?amount=10&category=9&difficulty=hard&type=multiple";
+const api_url = "https://opentdb.com/api.php?amount=10&type=multiple";
 
 export async function GET() {
     try {
         const response = await fetch(api_url, {
+            method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
-            cache: 'no-store',
+            next: {
+                revalidate: 0
+            }
         });
 
         const data = await response.json();
