@@ -1,7 +1,7 @@
 'use client'
 
 import { useScore } from "@/context/ScoreContext";
-import { User, X } from "lucide-react";
+import { User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AnalyzeWithAI from '@/config/gemini'
 

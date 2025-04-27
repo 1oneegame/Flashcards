@@ -32,7 +32,6 @@ export default function CardDisplay() {
     } = useScore();
     
     const [currentQuestion, setCurrentQuestion] = useState<Question>();
-    const [error, setError] = useState<string | null>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [showAnswer, setShowAnswer] = useState<boolean>(false);
 
@@ -46,7 +45,6 @@ export default function CardDisplay() {
     const fetchQuestion = async () => {
         try {
             setIsLoading(true);
-            setError(null);
             
             await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -65,7 +63,6 @@ export default function CardDisplay() {
 
             setCurrentQuestion(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'an error occured fetching the question');
             console.error('Error fetching question:', err);
         } finally {
             setIsLoading(false);

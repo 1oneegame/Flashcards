@@ -1,9 +1,7 @@
-'use client'
-import { FileText, GraduationCap, IdCard, User } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { FileText, IdCard, User } from "lucide-react"
+import Link from "next/link";
 
 export default function FunctionBlocks(){
-        const router = useRouter();
 
     const cardFunction = [
         {
@@ -26,10 +24,10 @@ export default function FunctionBlocks(){
         <div className="grid grid-cols-3 gap-8 mx-42 mt-8">
             {
               cardFunction.map((item, index) => (
-                <div onClick={() => router.push(item.href)} key={index} className="cursor-pointer border-1 shadow-md rounded-lg w-full min-h-[125px] flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 bg-indigo-100/20">
+                <Link href={item.href} key={index} className="cursor-pointer border-1 shadow-md rounded-lg w-full min-h-[125px] flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 bg-indigo-100/20">
                   {item.icon}
                   <h2 className="text-xl">{item.title}</h2>
-                </div>
+                </Link>
               ))
             }
         </div>

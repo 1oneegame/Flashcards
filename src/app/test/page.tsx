@@ -1,7 +1,6 @@
 'use client'
 
 import { Progress } from "@/components/ui/progress";
-import { Bookmark, Ellipsis, Share, Star } from "lucide-react";
 import { useCard } from "@/context/CardContext";
 import { cn } from "@/lib/utils";
 import FunctionBlocks from "@/components/FunctionBlocks";

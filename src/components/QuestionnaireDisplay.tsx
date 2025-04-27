@@ -24,11 +24,9 @@ export default function QuestionnaireDisplay() {
         setAnsweredQuestions,
         setSelectedAnswers,
         setShowCorrectAnswers,
-        setChosenCategory,
     } = useCard();
 
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const decodeHtml = (html: string) => {
         const txt = document.createElement('textarea');
@@ -48,7 +46,6 @@ export default function QuestionnaireDisplay() {
     const fetchQuestion = async () => {
         try {
             setIsLoading(true);
-            setError(null);
             
             await new Promise(resolve => setTimeout(resolve, 2000));
             
@@ -70,7 +67,6 @@ export default function QuestionnaireDisplay() {
             setAnsweredQuestions(new Array(data.results.length).fill(false));
             setSelectedAnswers(new Array(data.results.length).fill(''));
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'an error occured fetching the questions');
             console.error('Error fetching questions:', err);
         } finally {
             setIsLoading(false);
