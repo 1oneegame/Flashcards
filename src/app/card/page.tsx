@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import FunctionBlocks from "@/components/FunctionBlocks";
 import Navbar from "@/components/Navbar";
 import QuestionnaireDisplay from "@/components/QuestionnaireDisplay";
+import CardDisplay from "@/components/CardDisplay";
 
 export default function Home() {
     const {
@@ -21,16 +22,8 @@ export default function Home() {
         <div className="flex flex-col min-h-screen w-full">
             <Navbar/>
             <FunctionBlocks/>
-            <div className="mx-42 mt-8 flex flex-col border-1 rounded-lg shadow-lg h-fit min-h-[375px] relative">
-                <QuestionnaireDisplay/>
-            </div>
-            <div className="mx-42 mt-8 flex flex-col gap-8">
-                <div className="flex flex-row justify-center">
-                    <span className={cn("text-3xl font-light", currentQuestion === totalQuestions ? "hidden" : "block")}>
-                        {currentQuestion + 1} | {totalQuestions}
-                    </span>
-                </div>
-                <Progress value={progressValue} className="mb-8"/>
+            <div className="mx-42 mt-8 flex flex-col border-1 rounded-lg shadow-lg h-fit min-h-[375px] relative hover:scale-105 transition-transform duration-300 cursor-pointer">
+                <CardDisplay/>
             </div>
         </div>
     );

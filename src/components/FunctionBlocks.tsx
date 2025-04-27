@@ -8,7 +8,7 @@ export default function FunctionBlocks(){
     const cardFunction = [
         {
         title: "Flashcards",
-        href: "/",
+        href: "card/",
         icon: <IdCard className="w-8 h-8 text-blue-600"/>,
         },
         {

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Error fetching questions:', error);
         return NextResponse.json(
-            { error: 'error', details: error instanceof Error ? error.message : 'Unknown error' },
+            { error: 'если честно, то хз почему выдает ошибку', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

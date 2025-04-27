@@ -1,34 +1,30 @@
 'use client'
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
-import { useCard } from "@/context/CardContext";
 import Loading from "./Loading";
+import { Minus, MinusCircle, Plus, PlusCircle } from "lucide-react";
+
+interface QuestionItem {
+    type: string;
+    difficulty: string;
+    category: string;
+    question: string;
+    correct_answer: string;
+    incorrect_answers: string[];
+}
+
+interface Question {
+    response_code: number;
+    results: QuestionItem[];
+}
 
 export default function CardDisplay() {
-    const {
-        questions,
-        currentQuestion,
-        shuffledAnswers,
-        score,
-        answeredQuestions,
-        selectedAnswers,
-        showCorrectAnswers,
-        chosenCategory,
-        setQuestions,
-        setCurrentQuestion,
-        setShuffledAnswers,
-        setScore,
-        setAnsweredQuestions,
-        setSelectedAnswers,
-        setShowCorrectAnswers,
-        setChosenCategory,
-    } = useCard();
-
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [currentQuestion, setCurrentQuestion] = useState<Question>();
+    const [error, setError] = useState<string | null>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [showAnswer, setShowAnswer] = useState<boolean>(false);
 
     const decodeHtml = (html: string) => {
         const txt = document.createElement('textarea');
@@ -36,14 +32,6 @@ export default function CardDisplay() {
         return txt.value;
     };
 
-    const shuffleArray = (array: string[]) => {
-        const shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-    }; 
 
     const fetchQuestion = async () => {
         try {
@@ -51,14 +39,13 @@ export default function CardDisplay() {
             setError(null);
             
             await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            console.log(chosenCategory);
+
             const response = await fetch('/api/get-cards',{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(chosenCategory),
+                body: JSON.stringify({id:9, name: 'General Knowledge'}),
             });
             const data = await response.json();
 
@@ -66,202 +53,73 @@ export default function CardDisplay() {
                 throw new Error(data.error);
             }
 
-            setQuestions(data);
-            setAnsweredQuestions(new Array(data.results.length).fill(false));
-            setSelectedAnswers(new Array(data.results.length).fill(''));
+            setCurrentQuestion(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'an error occured fetching the questions');
-            console.error('Error fetching questions:', err);
+            setError(err instanceof Error ? err.message : 'an error occured fetching the question');
+            console.error('Error fetching question:', err);
         } finally {
             setIsLoading(false);
         }
     };
-
     useEffect(() => {
-        if (questions?.results?.[currentQuestion]) {
-            const allAnswers = [
-                questions.results[currentQuestion].correct_answer,
-                ...questions.results[currentQuestion].incorrect_answers
-            ].map(answer => decodeHtml(answer));
-            setShuffledAnswers(shuffleArray(allAnswers));
-        }
-    }, [questions, currentQuestion]);
-    
-    useEffect(() => {
-        setCurrentQuestion(0)
-        setShuffledAnswers([])
-        setScore(0)
-        setAnsweredQuestions([])
-        setSelectedAnswers([])
-        setShowCorrectAnswers(false);
         fetchQuestion();
-    }, []); 
+    }, [])
 
-    if (isLoading) {
-        return (
+    if(isLoading){
+        return(
             <Loading/>
-        );
-    }
+        )
+    }else{
+        return(
+            <div className="relative">
+                <div className="flex flex-col items-center relative h-fit min-h-[375px] perspective-distant " onClick={() => setShowAnswer(!showAnswer)}>
+                    <div className={cn("transition-all duration-300 transform-3d w-full h-fit min-h-[375px]",
+                        showAnswer ? 'rotate-y-180' : 'rotate-y-0'
+                    )}>
 
+                        <div className="absolute backface-hidden flex-col items-center bg-white w-full h-fit min-h-[375px]">
+                            <div className='relative mt-6'>
+                                <div className='flex flex-row justify-between items-center mb-2 gap-4 absolute top-0 left-1/2 -translate-x-1/2'>
+                                    <Badge className="font-medium text-sm">{decodeHtml(currentQuestion?.results[0].category)}</Badge>
+                                    <Badge className={cn("font-medium text-sm", {
+                                        "bg-green-500": currentQuestion?.results[0].difficulty === "easy",
+                                        "bg-yellow-500": currentQuestion?.results[0].difficulty === "medium",
+                                        "bg-red-500": currentQuestion?.results[0].difficulty === "hard",
+                                    })}>
+                                        {currentQuestion?.results[0].difficulty}
+                                    </Badge>
+                                </div>
+                            </div>
+                            <h1 className="text-4xl text-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ">{decodeHtml(currentQuestion?.results[0].question)}</h1>
+                            <span className="text-md text-gray-500 absolute left-1/2 bottom-0 -translate-x-1/2 -translate-y-6 ">Tap to check the answer</span>
+                        </div>
 
-    if (!questions || !questions.results) {
-        return null;
-    }
+                        <div className={cn("absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 backface-hidden flex flex-col items-center bg-white transition-all duration-300",
+                            showAnswer ? 'rotate-y-180' : 'hidden rotate-y-0'
+                        )}>
+                            <span className="text-4xl text-center">{decodeHtml(currentQuestion?.results[0].correct_answer)}</span>
+                            <span className="text-md text-gray-500 mt-4 text-center">Tap to return back</span>
+                        </div>
 
-    const allQuestionsAnswered = answeredQuestions.every(answered => answered);
-    
-    if (currentQuestion >= questions.results.length && allQuestionsAnswered) {
-        const totalQuestions = questions.results.length;
-        const percentage = Math.round((score / totalQuestions) * 100);
-        
-        return (
-            <div className="h-full w-full px-4 py-6">
-                <div className="flex flex-col items-center justify-center space-y-6 text-center">
-                    <h2 className="text-4xl font-bold">The test is completed!</h2>
-                    <span className="text-4xl font-bold">
-                        {percentage}%
-                    </span>
-                    <div className="text-xl">
-                        Correct answers: {score} from {totalQuestions}
-                    </div>
-                    <div className={cn("text-lg font-semibold", {
-                        "text-green-500": percentage >= 80,
-                        "text-yellow-500": percentage >= 50 && percentage < 80,
-                        "text-red-500": percentage < 50,
-                    })}>
-                        {percentage >= 80 ? "Well job!!!" :
-                         percentage >= 50 ? "Satisfactory result!" :
-                         "You should learn more!"}
-                    </div>
-                    <div className="flex flex-row justify-center gap-8">
-                        <button
-                            className="shadow-md hover:scale-105 cursor-pointer px-8 py-2 bg-blue-500 text-xl font-medium text-white hover:text-blue-500 border-2 border-blue-500 rounded-lg hover:bg-white transition-all duration-300"
-                            onClick={async () => {
-                                setCurrentQuestion(0);
-                                setScore(0);
-                                setShowCorrectAnswers(false);
-                                await fetchQuestion();
-                            }}
-                        >
-                            Try again!
-                        </button>
-                        <button 
-                            className="shadow-md hover:scale-110 cursor-pointer px-8 py-2 bg-white border-blue-500 border-2 text-xl font-medium text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all duration-300"
-                            onClick={() => {
-                                setShowCorrectAnswers(!showCorrectAnswers);
-                                setCurrentQuestion(0);
-                            }}
-                        >
-                            Check
-                        </button>
                     </div>
                 </div>
+                {
+                <div className="absolute top-0 translate-y-6 w-full">
+                        <div className="flex flex-row justify-between w-full px-12 ">
+                            <span className={cn('p-2 text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                                showAnswer ? '' : 'hidden'
+                            )}>
+                                I know
+                            </span>
+                            <span className={cn('p-2 text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                                showAnswer ? '' : 'hidden'
+                            )}>
+                                I don't know    
+                            </span>
+                        </div>
+                </div>
+                }
             </div>
         );
     }
-
-    if (currentQuestion >= questions.results.length && !allQuestionsAnswered) {
-        const unansweredIndex = answeredQuestions.findIndex(answered => !answered);
-        setCurrentQuestion(unansweredIndex);
-        return null;
-    }
-
-    return (
-        <div className="h-full w-full px-4 py-6">
-            <div className="flex flex-row justify-between items-center mx-8 relative">
-                <button 
-                    onClick={() => setCurrentQuestion(currentQuestion - 1)}
-                    disabled={currentQuestion === 0}
-                    className={cn(
-                        "p-2 rounded-full transition-all absolute left-0 top-0",
-                        currentQuestion === 0 
-                            ? "hidden" 
-                            : "hover:bg-gray-100"
-                    )}
-                >
-                    <ArrowLeft className="w-6 h-6" />
-                </button>
-                <div className="flex flex-row justify-between items-center mb-2 gap-4 absolute top-0 left-1/2 -translate-x-1/2">
-                    <Badge className="font-medium text-sm">{decodeHtml(questions.results[currentQuestion].category)}</Badge>
-                    <Badge className={cn("font-medium text-sm", {
-                        "bg-green-500": questions.results[currentQuestion].difficulty === "easy",
-                        "bg-yellow-500": questions.results[currentQuestion].difficulty === "medium",
-                        "bg-red-500": questions.results[currentQuestion].difficulty === "hard",
-                    })}>
-                        {questions.results[currentQuestion].difficulty}
-                    </Badge>
-                </div>
-                <button 
-                    onClick={() => setCurrentQuestion(currentQuestion + 1)}
-                    disabled={currentQuestion === questions.results.length - 1}
-                    className={cn(
-                        "p-2 rounded-full transition-all absolute right-0 top-0",
-                        currentQuestion === questions.results.length - 1 
-                            ? "hidden" 
-                            : "hover:bg-gray-100"
-                    )}
-                >
-                    <ArrowRight className="w-6 h-6" />
-                </button>
-            </div>
-            
-            <div className="flex flex-col items-center p-4 mt-8">
-                <div className="w-full px-4">
-                    <p className="text-lg mb-4 whitespace-pre-wrap">{decodeHtml(questions.results[currentQuestion].question)}</p>
-                    <div className="grid grid-cols-1 gap-4 mt-4">
-                        {shuffledAnswers.map((answer, index) => {
-                            const isCorrect = answer === decodeHtml(questions.results[currentQuestion].correct_answer);
-                            const isSelected = selectedAnswers[currentQuestion] === answer;
-                            
-                            return (
-                                <button
-                                    key={index}
-                                    className={cn(
-                                        "w-full p-3 text-left rounded-lg transition-colors duration-300 cursor-pointer whitespace-pre-wrap",
-                                        showCorrectAnswers
-                                            ? isCorrect
-                                                ? "bg-green-100 border-2 border-green-500"
-                                                : isSelected
-                                                    ? "bg-red-100 border-2 border-red-500"
-                                                    : "bg-gray-100"
-                                            : isSelected
-                                                ? "bg-blue-100 border-2 border-blue-500"
-                                                : "bg-gray-100 hover:bg-gray-200"
-                                    )}
-                                    onClick={() => {
-                                        if (showCorrectAnswers) return;
-                                        
-                                        const newSelected = [...selectedAnswers];
-                                        newSelected[currentQuestion] = answer;
-                                        setSelectedAnswers(newSelected);
-                                        
-                                        if(isCorrect) {
-                                            setScore(score + 1);
-                                        }
-                                        
-                                        const newAnswered = [...answeredQuestions];
-                                        newAnswered[currentQuestion] = true;
-                                        setAnsweredQuestions(newAnswered);
-                                        
-                                        if (currentQuestion + 1 >= questions.results.length) {
-                                            if (newAnswered.every(answered => answered)) {
-                                                setCurrentQuestion(questions.results.length);
-                                            } else {
-                                                const nextUnanswered = newAnswered.findIndex(answered => !answered);
-                                                setCurrentQuestion(nextUnanswered);
-                                            }
-                                        } else {
-                                            setCurrentQuestion(currentQuestion + 1);
-                                        }
-                                    }}
-                                >
-                                    {answer}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 }
