@@ -1,11 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-const api_url = "https://opentdb.com/api.php?amount=10&type=multiple";
-
-export async function GET() {
+export async function POST(request: NextRequest) {
+    const chosenCategory = await request.json();
+    const api_url = `https://opentdb.com/api.php?amount=10&category=${chosenCategory.id}`;
+    
     try {
         const response = await fetch(api_url, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Accept': 'application/json',
             },
@@ -14,12 +15,17 @@ export async function GET() {
             }
         });
 
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
         const data = await response.json();
-        
+
         return NextResponse.json(data);
     } catch (error) {
+        console.error('Error fetching questions:', error);
         return NextResponse.json(
-            { error: 'Не удалось загрузить вопросы' },
+            { error: 'error', details: error instanceof Error ? error.message : 'Unknown error' },
             { status: 500 }
         );
     }

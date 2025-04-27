@@ -1,6 +1,11 @@
 'use client'
 import { createContext, useContext, ReactNode, useState } from 'react';
 
+interface CategoryItem {
+    id: number;
+    name: string;
+}
+
 interface QuestionItem {
     type: string;
     difficulty: string;
@@ -23,6 +28,7 @@ interface CardContextType {
     answeredQuestions: boolean[];
     selectedAnswers: string[];
     showCorrectAnswers: boolean;
+    chosenCategory: CategoryItem;
     setQuestions: (questions: Question) => void;
     setCurrentQuestion: (index: number) => void;
     setShuffledAnswers: (answers: string[]) => void;
@@ -30,6 +36,7 @@ interface CardContextType {
     setAnsweredQuestions: (answered: boolean[]) => void;
     setSelectedAnswers: (selected: string[]) => void;
     setShowCorrectAnswers: (show: boolean) => void;
+    setChosenCategory: (category: CategoryItem) => void;
 }
 
 const CardContext = createContext<CardContextType | undefined>(undefined);
@@ -42,6 +49,11 @@ export function CardProvider({ children }: { children: ReactNode }) {
     const [answeredQuestions, setAnsweredQuestions] = useState<boolean[]>([]);
     const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
     const [showCorrectAnswers, setShowCorrectAnswers] = useState<boolean>(false);
+    const [chosenCategory, setChosenCategory] = useState<CategoryItem>({
+        id: 9,
+        name: 'General knowledge'
+    })
+
 
     const value = {
         questions,
@@ -51,13 +63,15 @@ export function CardProvider({ children }: { children: ReactNode }) {
         answeredQuestions,
         selectedAnswers,
         showCorrectAnswers,
+        chosenCategory,
         setQuestions,
         setCurrentQuestion,
         setShuffledAnswers,
         setScore,
         setAnsweredQuestions,
         setSelectedAnswers,
-        setShowCorrectAnswers
+        setShowCorrectAnswers,
+        setChosenCategory,
     };
 
     return <CardContext.Provider value={value}>{children}</CardContext.Provider>;

@@ -1,6 +1,8 @@
 'use client'
+import { useCard } from "@/context/CardContext";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import Loading from "./Loading";
 
 interface CategoryItem {
     id: number;
@@ -13,9 +15,13 @@ interface Category {
 
 export default function CategoryDisplay() {
     const [categories, setCategories] = useState<Category>();
-    const [chosenCategory, setChosenCategory] = useState<CategoryItem>();
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
+
+    const {
+        chosenCategory,
+        setChosenCategory,
+    } = useCard();
 
     const fetchCategories = async () => {
         const response = await fetch('api/get-categories');
@@ -29,10 +35,12 @@ export default function CategoryDisplay() {
         setIsLoading(true);
         fetchCategories();
     }, []); 
-
-    return(
-        (
-        !isLoading &&
+    if (isLoading) {
+        return (
+            <Loading/>
+        );
+    }else{
+        return(
             <div className="flex flex-col space-y-2 p-4">
                 <h1 className="text-2xl mb-4 ml-4 font-bold text-blue-500">Categories:</h1>
                 {categories?.trivia_categories.map((category) => (
@@ -45,6 +53,6 @@ export default function CategoryDisplay() {
                     </div>
                 ))}
             </div>
-        )
-    );
+        );
+    }
 }

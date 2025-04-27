@@ -1,10 +1,11 @@
 'use client'
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import { useCard } from "@/context/CardContext";
+import Loading from "./Loading";
 
 export default function CardDisplay() {
     const {
@@ -15,14 +16,19 @@ export default function CardDisplay() {
         answeredQuestions,
         selectedAnswers,
         showCorrectAnswers,
+        chosenCategory,
         setQuestions,
         setCurrentQuestion,
         setShuffledAnswers,
         setScore,
         setAnsweredQuestions,
         setSelectedAnswers,
-        setShowCorrectAnswers
+        setShowCorrectAnswers,
+        setChosenCategory,
     } = useCard();
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const decodeHtml = (html: string) => {
         const txt = document.createElement('textarea');
@@ -40,12 +46,35 @@ export default function CardDisplay() {
     }; 
 
     const fetchQuestion = async () => {
-        const response = await fetch('/api/get-cards');
-        const data = await response.json();
-        
-        setQuestions(data);
-        setAnsweredQuestions(new Array(data.results.length).fill(false));
-        setSelectedAnswers(new Array(data.results.length).fill(''));
+        try {
+            setIsLoading(true);
+            setError(null);
+            
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            console.log(chosenCategory);
+            const response = await fetch('/api/get-cards',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(chosenCategory),
+            });
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            setQuestions(data);
+            setAnsweredQuestions(new Array(data.results.length).fill(false));
+            setSelectedAnswers(new Array(data.results.length).fill(''));
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'an error occured fetching the questions');
+            console.error('Error fetching questions:', err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -59,11 +88,24 @@ export default function CardDisplay() {
     }, [questions, currentQuestion]);
     
     useEffect(() => {
+        setCurrentQuestion(0)
+        setShuffledAnswers([])
+        setScore(0)
+        setAnsweredQuestions([])
+        setSelectedAnswers([])
+        setShowCorrectAnswers(false);
         fetchQuestion();
     }, []); 
 
+    if (isLoading) {
+        return (
+            <Loading/>
+        );
+    }
+
+
     if (!questions || !questions.results) {
-        return <div className="flex items-center justify-center h-full">Loading...</div>;
+        return null;
     }
 
     const allQuestionsAnswered = answeredQuestions.every(answered => answered);
@@ -140,7 +182,7 @@ export default function CardDisplay() {
                     <ArrowLeft className="w-6 h-6" />
                 </button>
                 <div className="flex flex-row justify-between items-center mb-2 gap-4 absolute top-0 left-1/2 -translate-x-1/2">
-                    <Badge className="font-medium text-sm">{questions.results[currentQuestion].category}</Badge>
+                    <Badge className="font-medium text-sm">{decodeHtml(questions.results[currentQuestion].category)}</Badge>
                     <Badge className={cn("font-medium text-sm", {
                         "bg-green-500": questions.results[currentQuestion].difficulty === "easy",
                         "bg-yellow-500": questions.results[currentQuestion].difficulty === "medium",
