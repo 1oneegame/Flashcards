@@ -8,6 +8,7 @@ import FunctionBlocks from "@/components/FunctionBlocks";
 import Navbar from "@/components/Navbar";
 import QuestionnaireDisplay from "@/components/QuestionnaireDisplay";
 import CardDisplay from "@/components/CardDisplay";
+import { ScoreProvider } from "@/context/ScoreContext";
 
 export default function Home() {
     const {

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { cn } from "@/lib/utils";
 import Loading from "./Loading";
-import { Minus, MinusCircle, Plus, PlusCircle } from "lucide-react";
+
+import { useScore } from "@/context/ScoreContext";
 
 interface QuestionItem {
     type: string;
@@ -21,6 +22,15 @@ interface Question {
 }
 
 export default function CardDisplay() {
+    const { 
+        questionAmount, 
+        correctCount, 
+        wrongQuestions,
+        setQuestionAmount, 
+        setCorrectCount,
+        setWrongQuestions,
+    } = useScore();
+    
     const [currentQuestion, setCurrentQuestion] = useState<Question>();
     const [error, setError] = useState<string | null>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -63,7 +73,8 @@ export default function CardDisplay() {
     };
     useEffect(() => {
         fetchQuestion();
-    }, [])
+        setShowAnswer(false);
+    }, [questionAmount])
 
     if(isLoading){
         return(
@@ -106,12 +117,23 @@ export default function CardDisplay() {
                 {
                 <div className="absolute top-0 translate-y-6 w-full">
                         <div className="flex flex-row justify-between w-full px-12 ">
-                            <span className={cn('p-2 text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                            <span onClick={() => { setCorrectCount(correctCount+1), setQuestionAmount(questionAmount+1) } } className={cn('p-2 text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
                                 showAnswer ? '' : 'hidden'
                             )}>
                                 I know
                             </span>
-                            <span className={cn('p-2 text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                            <span 
+                                onClick={() => {
+                                    setQuestionAmount(questionAmount + 1);
+                                    setWrongQuestions([
+                                        ...wrongQuestions,
+                                        {
+                                            question: currentQuestion?.results[0].question ?? "",
+                                            correct_answer: currentQuestion?.results[0].correct_answer ?? "",
+                                        },
+                                    ]);
+                                } 
+                            } className={cn('p-2 text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
                                 showAnswer ? '' : 'hidden'
                             )}>
                                 I don't know    

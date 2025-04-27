@@ -47,7 +47,7 @@ export default function CategoryDisplay() {
                     <div 
                         onClick={() => setChosenCategory(category)}
                         key={category.id}
-                        className={cn("p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white", category == chosenCategory ? 'ring-1 ring-blue-500 cursor-' : 'cursor-pointer')}
+                        className={cn("p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white", category == chosenCategory ? 'ring-1 ring-blue-500' : 'cursor-pointer')}
                     >
                         {category.name}
                     </div>

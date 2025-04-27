@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CardProvider } from '@/context/CardContext'
+import { ScoreProvider } from "@/context/ScoreContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CardProvider>
+          <ScoreProvider>
           {children}
+          </ScoreProvider>
         </CardProvider>
       </body>
     </html>
