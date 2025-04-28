@@ -35,7 +35,7 @@ export default function ProfileCard({onData} : ChildComponentProps){
     }
 
     return(
-        <div className="flex flex-row items-center mx-42 mt-8 gap-8 relative">
+        <div className="flex flex-col sm:flex-row items-center mx-2 sm:mx-8 md:mx-16 lg:mx-28 mt-8 gap-4 sm:gap-8 relative">
                 <div className="flex flex-col gap-4 items-center">
                     <User className="w-32 h-32 border-2 rounded-full "/>
                     <h1 className="text-2xl">UserName</h1>

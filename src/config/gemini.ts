@@ -14,11 +14,15 @@ interface question {
 }
 
 export default async function AnalyzeWithAI (request: question) {
+
+  const config = [
+      "You are an expert in any field, with all the knowledge in the world. You are asked a question and the correct answer to it, and you need to explain it in simple words and briefly short, however it will be very clear to people who do not enjoy with this topic.",
+  ]
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
     contents: 'Question: ' + request.question + ' Answer: ' + request.correct_answer,
     config: {
-      systemInstruction: "You are an expert in any field, with all the knowledge in the world. You are asked a question and the correct answer to it, and you need to explain it in simple words and very briefly.",
+      systemInstruction: config[0],
     },
   });
   

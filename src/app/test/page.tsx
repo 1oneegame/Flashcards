@@ -17,13 +17,13 @@ export default function Home() {
     const totalQuestions = questions?.results?.length || 0;
 
     return (
-        <div className="flex flex-col min-h-screen w-full">
+        <div className="w-full min-h-screen pb-20">
             <Navbar/>
             <FunctionBlocks/>
-            <div className="mx-42 mt-8 flex flex-col border-1 rounded-lg shadow-lg h-fit min-h-[375px] relative">
+            <div className="mx-2 sm:mx-8 md:mx-16 lg:mx-28 mt-8 flex flex-col border-1 rounded-lg shadow-lg h-fit min-h-[375px] relative">
                 <QuestionnaireDisplay/>
             </div>
-            <div className="mx-42 mt-8 flex flex-col gap-8">
+            <div className="mx-2 sm:mx-8 md:mx-16 lg:mx-28 mt-8 flex flex-col gap-8">
                 <div className="flex flex-row justify-center">
                     <span className={cn("text-3xl font-light", currentQuestion === totalQuestions ? "hidden" : "block")}>
                         {currentQuestion + 1} | {totalQuestions}

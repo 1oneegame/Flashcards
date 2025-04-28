@@ -100,8 +100,8 @@ export default function CardDisplay() {
                         <div className="absolute backface-hidden flex-col items-center bg-white w-full h-fit min-h-[375px]">
                             <div className='relative mt-6'>
                                 <div className='flex flex-row justify-between items-center mb-2 gap-4 absolute top-0 left-1/2 -translate-x-1/2'>
-                                    <Badge className="font-medium text-sm">{decodeHtml(currentQuestion?.results[0].category || '')}</Badge>
-                                    <Badge className={cn("font-medium text-sm", {
+                                    <Badge className="font-medium text-base md:text-sm">{decodeHtml(currentQuestion?.results[0].category || '')}</Badge>
+                                    <Badge className={cn("font-medium text-base md:text-sm", {
                                         "bg-green-500": currentQuestion?.results[0].difficulty === "easy",
                                         "bg-yellow-500": currentQuestion?.results[0].difficulty === "medium",
                                         "bg-red-500": currentQuestion?.results[0].difficulty === "hard",
@@ -110,23 +110,23 @@ export default function CardDisplay() {
                                     </Badge>
                                 </div>
                             </div>
-                            <h1 className="text-4xl text-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ">{decodeHtml(currentQuestion?.results[0].question || '')}</h1>
-                            <span className="text-md text-gray-500 absolute left-1/2 bottom-0 -translate-x-1/2 -translate-y-6 ">Tap to check the answer</span>
+                            <h1 className="text-xl sm:text-2xl md:text-4xl text-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ">{decodeHtml(currentQuestion?.results[0].question || '')}</h1>
+                            <span className="text-base sm:text-sm md:text-md lg:text-lg text-gray-500 absolute left-1/2 bottom-0 -translate-x-1/2 -translate-y-6 ">Tap to check the answer</span>
                         </div>
 
                         <div className={cn("absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 backface-hidden flex flex-col items-center bg-white transition-all duration-300",
                             showAnswer ? 'rotate-y-180' : 'hidden rotate-y-0'
                         )}>
-                            <span className="text-4xl text-center">{decodeHtml(currentQuestion?.results[0].correct_answer || '')}</span>
-                            <span className="text-md text-gray-500 mt-4 text-center">Tap to return back</span>
-                        </div>
+                            <span className="text-xl sm:text-2xl md:text-4xl text-center">{decodeHtml(currentQuestion?.results[0].correct_answer || '')}</span>
+                            <span className="text-base sm:text-sm md:text-md lg:text-lg text-gray-500 mt-4 text-center">Tap to return back</span>
+                        </div> 
 
                     </div>
                 </div>
                 {
                 <div className="absolute top-0 translate-y-6 w-full">
                         <div className="flex flex-row justify-between w-full px-12 ">
-                            <span onClick={() => { setCorrectCount(correctCount+1); setQuestionAmount(questionAmount+1); } } className={cn('p-2 text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                            <span onClick={() => { setCorrectCount(correctCount+1); setQuestionAmount(questionAmount+1); } } className={cn('p-1 md:p-2 text-lg sm:text-xl md:text-2xl text-emerald-500 hover:text-emerald-600 border-2 border-emerald-500 hover:border-emerald-600 hover:bg-emerald-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
                                 showAnswer ? '' : 'hidden'
                             )}>
                                 I know
@@ -142,10 +142,10 @@ export default function CardDisplay() {
                                             correct_answer: currentQuestion?.results[0].correct_answer ?? "",
                                         },
                                     ]);
-                                }} className={cn('p-2 text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
+                                }} className={cn('p-1 md:p-2 text-lg sm:text-xl md:text-2xl text-red-500 hover:text-red-600 border-2 border-red-500 hover:border-red-600 hover:bg-red-100 rounded-lg pointer-cursor hover:scale-110 transition-all duration-300',
                                 showAnswer ? '' : 'hidden'
                             )}>
-                                I don&apos;t know    
+                                I dont know    
                             </span>
                         </div>
                 </div>

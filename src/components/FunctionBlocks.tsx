@@ -21,7 +21,7 @@ export default function FunctionBlocks(){
         },
     ]
     return(
-        <div className="grid grid-cols-3 gap-8 mx-42 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mx-2 sm:mx-8 md:mx-16 lg:mx-28 mt-8">
             {
               cardFunction.map((item, index) => (
                 <Link href={item.href} key={index} className="cursor-pointer border-1 shadow-md rounded-lg w-full min-h-[125px] flex flex-col items-center justify-center hover:scale-105 transition-transform duration-300 bg-indigo-100/20">

@@ -25,7 +25,7 @@ export default function Page(){
     };
 
     return(
-        <div className="flex flex-col min-h-screen w-full relative pb-20">
+        <div className="w-full min-h-screen relative pb-20">
             {
                 isModalWindowOpen && 
                     <div className="z-1 bg-black/40 w-full h-full flex justify-center items-center absolute">

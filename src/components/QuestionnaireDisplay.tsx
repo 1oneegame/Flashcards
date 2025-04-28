@@ -145,7 +145,7 @@ export default function QuestionnaireDisplay() {
 
     return (
         <div className="h-full w-full px-4 py-6">
-            <div className="flex flex-row justify-between items-center mx-8 relative">
+            <div className="flex flex-row justify-between items-center mx-4 md:mx-8 relative">
                 <button 
                     onClick={() => setCurrentQuestion(currentQuestion - 1)}
                     disabled={currentQuestion === 0}
