@@ -1,6 +1,5 @@
 # FlashCards
 
-##Video: https://www.loom.com/share/b0b0993f1e374adbbb6297f04b8be644?sid=76529d33-7450-4d56-b98b-ed337bfb4c98
 
 ### Краткое описание:
 
